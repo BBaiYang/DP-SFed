@@ -46,6 +46,7 @@ def evaluate_accuracy(model, data_iter):
 class CloudSever:
     def __init__(self, clients, dataloader):
         self.model = model_factory(data_set_name, model_name).to(device)
+        print(self.model)
         self._save_model()
         self.clients = clients
         self.total_size = 0

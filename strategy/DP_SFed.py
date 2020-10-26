@@ -16,19 +16,13 @@ import os
 class DPSFedTrainer:
     def __init__(self):
         fed_log("A DPSFedTrainer is inited, this trainer use the strategy DP_SFed proposed by YangHe. \n")
-        # distribution_matrix = get_distribution(split_mode, split_matrix)
-        # clients_num = len(distribution_matrix)
         clients_num = hp['n_clients']
         edge_servers_num = 1
 
         # 构造客户端及相应的本地数据集
-        # local_dataloaders, local_sample_sizes, test_dataloader = dataloader_getter(data_set_name, distribution_matrix)
         local_dataloaders, local_sample_sizes, test_dataloader = get_data_loaders()
         self.clients = [Client(_id + 1, local_dataloaders[_id], sample_size)
                         for sample_size, _id in zip(local_sample_sizes, list(range(clients_num)))]
-
-        # 构造各类节点及节点连接关系 ,在DP_SFed联邦策略中，并不仅仅只有一个服务器，而是若干层级服务器, cloud server & edge server
-        # 需要建立客户端和边缘服务器的连接关系、客户端和云服务器的连接关系、边缘服务器和云服务器的连接关系
         self.edge_servers = [EdgeSever(_id + 1, self.clients)
                              for _id in range(edge_servers_num)]
         self.cloud_server = CloudSever(self.clients, self.edge_servers, test_dataloader)

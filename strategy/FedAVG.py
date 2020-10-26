@@ -30,7 +30,7 @@ class FedAVGTrainer:
             client.load_original_model()
 
     def begin_train(self):
-        fed_log(f"DPSFedTrainer is going to train, the model is a: {model_name} model")
+        fed_log(f"FedAVGTrainer is going to train, the model is a: {model_name} model")
         for t in range(self.communication_rounds):
             self.current_round = t + 1
             self.train_step()
