@@ -6,7 +6,6 @@ from configs import HYPER_PARAMETERS as hyper_parameters
 import torch
 from torch.utils import data
 from utils import FED_LOG as fed_log
-from data_utils import get_data_loaders
 
 
 cfg = {

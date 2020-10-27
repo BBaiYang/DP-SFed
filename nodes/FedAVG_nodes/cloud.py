@@ -32,6 +32,7 @@ def accuracy(y_hat, y):
 
 
 def evaluate_accuracy(model, data_iter):
+    model.eval()
     metric = Accumulator(3)
     for X, y in data_iter:
         X = X.to(device)
@@ -40,6 +41,7 @@ def evaluate_accuracy(model, data_iter):
         test_acc = accuracy(y_pred, y)
         test_l = loss(y_pred, y)
         metric.add(test_acc, test_l * len(y), len(y))
+    model.train()
     return metric[0] / metric[2], metric[1] / metric[2]
 
 
@@ -57,17 +59,15 @@ class CloudSever:
     def aggregate(self):
         fed_log("Cloud server begins to aggregate client model...")
         aggregated_client_model = {}
-        for client in self.clients:
+        for k, client in enumerate(self.clients):
             weight = client.sample_size / self.total_size
             print(f'{client.client_id}\'s weight is {weight}')
-            for name, param in client.model.named_parameters():
-                if name not in aggregated_client_model.keys():
+            for name, param in client.model.state_dict().items():
+                if k == 0:
                     aggregated_client_model[name] = param.data * weight
                 else:
                     aggregated_client_model[name] += param.data * weight
-        for name, param in self.model.named_parameters():
-            param.data = aggregated_client_model[name]
-
+        self.model.load_state_dict(aggregated_client_model)
         self._save_params()
 
     def validation(self):

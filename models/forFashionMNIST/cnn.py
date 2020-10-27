@@ -23,12 +23,12 @@ class Accumulator:
 
 
 def accuracy(y_hat, y):
-    cmp = (y_hat.argmax(dim=1).type(y.dtype) == y).sum().float()
+    cmp = (y_hat.argmax(dim=1).type(y.dtype) == y).float().sum().item()
     return cmp
 
 
 def evaluate_accuracy(net, data_iter, loss, device):
-    # net.eval()
+    net.eval()
     metric = Accumulator(3)
     for X, y in data_iter:
         X = X.to(device)
@@ -37,6 +37,7 @@ def evaluate_accuracy(net, data_iter, loss, device):
         test_acc = accuracy(y_pred, y)
         test_l = loss(y_pred, y)
         metric.add(test_acc, test_l * len(y), len(y))
+    net.train()
     return metric[0] / metric[2], metric[1] / metric[2]
 
 
