@@ -32,6 +32,8 @@ def accuracy(y_hat, y):
 
 
 def evaluate_accuracy(client_model, edge_model, data_iter):
+    client_model.eval()
+    edge_model.eval()
     metric = Accumulator(3)
     for X, y in data_iter:
         X = X.to(device)
@@ -40,6 +42,8 @@ def evaluate_accuracy(client_model, edge_model, data_iter):
         test_acc = accuracy(y_pred, y)
         test_l = loss(y_pred, y)
         metric.add(test_acc, test_l * len(y), len(y))
+    client_model.train()
+    edge_model.train()
     return metric[0] / metric[2], metric[1] / metric[2]
 
 
@@ -64,25 +68,23 @@ class CloudSever:
         aggregated_client_model = {}
         for k, client in enumerate(self.clients):
             weight = client.sample_size / self.total_client_data_size
-            for name, param in client.model.named_parameters():
+            for name, param in client.model.state_dict().items():
                 if k == 0:
                     aggregated_client_model[name] = param.data * weight
                 else:
                     aggregated_client_model[name] += param.data * weight
-        for name, param in self.client_model.named_parameters():
-            param.data = aggregated_client_model[name]
+        self.client_model.load_state_dict(aggregated_client_model)
 
         fed_log("Cloud server begins to aggregate edge model...")
         aggregated_edge_model = {}
         for k, edge in enumerate(self.edge_servers):
             weight = edge.sample_size / self.total_edge_data_size
-            for name, param in edge.aggregated_model.named_parameters():
+            for name, param in edge.aggregated_model.state_dict().items():
                 if k == 0:
                     aggregated_edge_model[name] = param.data * weight
                 else:
                     aggregated_edge_model[name] += param.data * weight
-        for name, param in self.edge_model.named_parameters():
-            param.data = aggregated_edge_model[name]
+        self.edge_model.load_state_dict(aggregated_edge_model)
 
         self._save_params()
 
@@ -98,8 +100,8 @@ class CloudSever:
             client_model = nn.Sequential(*list(self.model.children())[:1])
             edge_model = nn.Sequential(*list(self.model.children())[1:])
         if 'VGG' in model_name:
-            client_model = list(self.model.children())[0][:3]
-            edge_model = list(self.model.children())[0][3:]
+            client_model = list(self.model.children())[0][:1]
+            edge_model = list(self.model.children())[0][1:]
         return client_model, edge_model
 
     def _save_model(self):
