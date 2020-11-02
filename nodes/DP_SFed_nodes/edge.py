@@ -23,17 +23,11 @@ class EdgeSever:
         self.optimizer = None
 
     def load_original_model(self):
-        # for client in self.clients:
-        #     client_id = client.client_id
-        #     self.models[client_id] = torch.load(initial_edge_model_path)
-        #     self.optimizers[client_id] = optim.SGD(self.models[client_id].parameters(), lr=lr, momentum=momentum)
         self.aggregated_model = torch.load(initial_edge_model_path)
         self.optimizer = optim.SGD(self.aggregated_model.parameters(), lr=lr, momentum=momentum)
 
     def initialize(self):
         if os.path.exists(edge_model_path):
-            # for model in self.models.values():
-            #     model.load_state_dict(torch.load(edge_model_path))
             self.aggregated_model.load_state_dict(torch.load(edge_model_path))
 
     # def edge_forward_backward(self):
@@ -66,28 +60,34 @@ class EdgeSever:
         features = None
         labels = None
         client_step_sizes = []
-        for client in self.clients:
-            client_id = client.client_id
-            fed_log(f'{self.edge_id} uses data from {client_id}...')
-            X, y = torch.load(os.path.join(client_outputs_path, f'{client_id}_to_{self.edge_id}.pt'))
-            client_step_sizes.append(len(X))
-            if (features, labels) == (None, None):
-                features, labels = X, y.to(device)
-            else:
-                features, labels = torch.cat((features, X)), torch.cat((labels, y.to(device)))
-        features.retain_grad()
-        self.optimizer.zero_grad()
-        train_l = loss(self.aggregated_model(features), labels)
-        train_l.backward()
-        self.optimizer.step()
+        for _ in range(edge_epochs):
+            if not (features, labels) == (None, None):
+                features, labels = None, None
+            for client in self.clients:
+                client_id = client.client_id
+                # fed_log(f'{self.edge_id} uses data from {client_id}...')
+                X, y = torch.load(os.path.join(client_outputs_path, f'{client_id}_to_{self.edge_id}.pt'))
+                client_step_sizes.append(len(X))
+                if (features, labels) == (None, None):
+                    features, labels = X, y.to(device)
+                else:
+                    features, labels = torch.cat((features, X)), torch.cat((labels, y.to(device)))
+            features.retain_grad()
+            self.optimizer.zero_grad()
+            train_l = loss(self.aggregated_model(features), labels)
+            train_l.backward()
+            self.optimizer.step()
 
+        self.send_to_client(features.grad.data, client_step_sizes)
+
+    def send_to_client(self, output_grad, client_step_sizes):
         start = 0
         end = 0
         for i, client in enumerate(self.clients):
             client_id = client.client_id
             step_size = client_step_sizes[i]
             end += step_size
-            torch.save(features.grad.data[start: end],
+            torch.save(output_grad[start: end],
                        os.path.join(output_grads_path, f'{self.edge_id}_to_{client_id}.pt'))
             start = end
 
@@ -96,3 +96,4 @@ device = hp['device']
 lr = hp['lr']
 momentum = hp['momentum']
 loss = torch.nn.CrossEntropyLoss()
+edge_epochs = hp['edge_epochs']

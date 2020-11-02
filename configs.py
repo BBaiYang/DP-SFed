@@ -12,15 +12,16 @@ DEBUG = 1
 # ======================================
 HYPER_PARAMETERS = {
     "device": 'cuda: 3',
-    "device_for_baseline": 'cuda: 3',
-    "communication_rounds": 2000,
-    "global_epochs": 150,
+    "device_for_baseline": 'cuda: 2',
+    "communication_rounds": 1000,
+    "global_epochs": 100,
+    "edge_epochs": 30,
     "lr": .01,
     "momentum": .9,
-    "sampling_pr": .05,
-    "batch_size": 500,
+    "sampling_pr": .02,
+    "batch_size": 250,
     "n_clients": 10,
-    "classes_per_client": 10,
+    "classes_per_client": 1,
     "balancedness": 1,
     "dataset": "CIFAR10",
     "local_epochs": 1

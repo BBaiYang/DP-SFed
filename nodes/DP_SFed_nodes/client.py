@@ -43,8 +43,7 @@ class Client:
                 X = X.to(device)
                 X.requires_grad_(True)
                 self.output = checkpoint(self.model, X)
-                torch.save((self.output, y),
-                           os.path.join(client_outputs_path, f'{self.client_id}_to_{self.edge_server.edge_id}.pt'))
+                self.send_to_edge((self.output, y))
             else:
                 continue
         self.current_round += 1
@@ -55,6 +54,10 @@ class Client:
         self.optimizer.zero_grad()
         self.output.backward(output_grad)
         self.optimizer.step()
+
+    def send_to_edge(self, out):
+        torch.save(out,
+                   os.path.join(client_outputs_path, f'{self.client_id}_to_{self.edge_server.edge_id}.pt'))
 
 
 device = hp['device']
