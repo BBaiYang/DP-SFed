@@ -11,27 +11,30 @@ DEBUG = 1
 """超参数设置,字典方式存储"""
 # ======================================
 HYPER_PARAMETERS = {
-    "device": 'cuda: 3',
-    "device_for_baseline": 'cuda: 2',
-    "communication_rounds": 1000,
-    "global_epochs": 100,
-    "edge_epochs": 30,
-    "lr": .01,
-    "momentum": .9,
-    "sampling_pr": .02,
-    "batch_size": 250,
-    "n_clients": 10,
-    "classes_per_client": 1,
-    "balancedness": 1,
-    "dataset": "CIFAR10",
-    "local_epochs": 1
+    'device': 'cuda: 3',
+    'device_for_baseline': 'cuda: 2',
+    'communication_rounds': 2000,
+    'global_epochs': 100,
+    'edge_epochs': 20,
+    'lr': .01,
+    'momentum_for_trainer': .9,
+    'momentum_for_BN': .1,
+    'sampling_pr': .02,
+    'batch_size': 250,
+    'n_clients': 10,
+    'n_edges': 3,
+    'classes_per_client': 4,
+    'balancedness': .7,
+    'dataset': 'CIFAR10',
+    'local_epochs': 1,
+    'participating_ratio': 1
 }
 # ======================================
 
 """原始数据集设置"""
 # ======================================
 # 可用参数：MINIST FashionMNIST CIFAR10
-DATA_SET_NAME = "CIFAR10"
+DATA_SET_NAME = 'CIFAR10'
 # ======================================
 
 '''模型保存路径'''
@@ -54,5 +57,5 @@ FedAVG_aggregated_model_path = 'intermediate_variables/FedAVG_aggregated_model.p
 #            FashionMNIST : CNN
 #            CIFAR10 : VGG16
 
-MODEL_NAME = "VGG16"
+MODEL_NAME = 'VGG16'
 # ======================================

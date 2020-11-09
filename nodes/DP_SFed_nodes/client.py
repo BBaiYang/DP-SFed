@@ -37,7 +37,7 @@ class Client:
             self.model.load_state_dict(torch.load(client_model_path))
 
     def client_forward(self):
-        fed_log(f"{self.client_id} conducts forward propagation...")
+        # fed_log(f"{self.client_id} conducts forward propagation...")
         for batch, (X, y) in enumerate(self.train_loader):
             if batch % self.batches == self.current_round % self.batches:
                 X = X.to(device)
@@ -49,7 +49,7 @@ class Client:
         self.current_round += 1
 
     def client_backward(self):
-        fed_log(f'{self.client_id} conducts backward propagation')
+        # fed_log(f'{self.client_id} conducts backward propagation')
         output_grad = torch.load(os.path.join(output_grads_path, f'{self.edge_server.edge_id}_to_{self.client_id}.pt'))
         self.optimizer.zero_grad()
         self.output.backward(output_grad)
@@ -62,4 +62,4 @@ class Client:
 
 device = hp['device']
 lr = hp['lr']
-momentum = hp['momentum']
+momentum = hp['momentum_for_trainer']

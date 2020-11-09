@@ -2,7 +2,7 @@ import torch.nn as nn
 from forFashionMNIST.cnn import evaluate_accuracy
 import torchvision
 from torchvision import transforms
-from configs import HYPER_PARAMETERS as hyper_parameters
+from configs import HYPER_PARAMETERS as hp
 import torch
 from torch.utils import data
 from utils import FED_LOG as fed_log
@@ -48,13 +48,16 @@ class VGG16(nn.Module):
                 layers += [nn.MaxPool2d(kernel_size=2, stride=2)]
             else:
                 layers += [nn.Conv2d(in_channels, x, kernel_size=3, padding=1),
-                           nn.BatchNorm2d(x),
+                           nn.BatchNorm2d(x, momentum=momentum),
                            nn.ReLU()]
                 in_channels = x
         layers += [nn.AvgPool2d(kernel_size=1, stride=1)]
         layers += [FlattenLayer()]
         layers += [nn.Linear(512, 10)]
         return nn.Sequential(*layers)
+
+
+momentum = hp['momentum_for_BN']
 
 
 if __name__ == '__main__':
@@ -75,12 +78,12 @@ if __name__ == '__main__':
                                                    train=False, download=True, transform=test_transform)
 
     '''hyper parameters'''
-    device = hyper_parameters['device_for_baseline']
-    sampling_pr = hyper_parameters['sampling_pr']
-    lr = hyper_parameters['lr']
-    momentum = hyper_parameters['momentum']
+    device = hp['device_for_baseline']
+    sampling_pr = hp['sampling_pr']
+    lr = hp['lr']
+    momentum = hp['momentum']
     batch_size = int(sampling_pr * len(cifar_train))
-    global_epochs = hyper_parameters['global_epochs']
+    global_epochs = hp['global_epochs']
     batches = int(1 / sampling_pr)
 
     net = VGG16().to(device)

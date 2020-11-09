@@ -7,20 +7,21 @@ from configs import initial_edge_model_path, edge_model_path, client_outputs_pat
 from configs import HYPER_PARAMETERS as hp
 import torch
 import os
+import random
 
 
-class EdgeSever:
+class Edge:
     def __init__(self, edge_id, clients):
         self.edge_id = f'edge_{edge_id}'
         self.clients = clients
         self.sample_size = 0
-        for client in self.clients:
-            client.set_edge_server(self)
-            self.sample_size += client.sample_size
         self.models = {}
         self.optimizers = {}
         self.aggregated_model = None
         self.optimizer = None
+        self.participating_clients = None
+        for client in self.clients:
+            client.set_edge_server(self)
 
     def load_original_model(self):
         self.aggregated_model = torch.load(initial_edge_model_path)
@@ -29,6 +30,9 @@ class EdgeSever:
     def initialize(self):
         if os.path.exists(edge_model_path):
             self.aggregated_model.load_state_dict(torch.load(edge_model_path))
+        self.participating_clients = random.sample(self.clients, int(participating_ratio * len(self.clients)))
+        for client in self.participating_clients:
+            self.sample_size += client.sample_size
 
     # def edge_forward_backward(self):
     #     for client in self.clients:
@@ -63,7 +67,7 @@ class EdgeSever:
         for _ in range(edge_epochs):
             if not (features, labels) == (None, None):
                 features, labels = None, None
-            for client in self.clients:
+            for client in self.participating_clients:
                 client_id = client.client_id
                 # fed_log(f'{self.edge_id} uses data from {client_id}...')
                 X, y = torch.load(os.path.join(client_outputs_path, f'{client_id}_to_{self.edge_id}.pt'))
@@ -83,7 +87,7 @@ class EdgeSever:
     def send_to_client(self, output_grad, client_step_sizes):
         start = 0
         end = 0
-        for i, client in enumerate(self.clients):
+        for i, client in enumerate(self.participating_clients):
             client_id = client.client_id
             step_size = client_step_sizes[i]
             end += step_size
@@ -94,6 +98,7 @@ class EdgeSever:
 
 device = hp['device']
 lr = hp['lr']
-momentum = hp['momentum']
+momentum = hp['momentum_for_trainer']
 loss = torch.nn.CrossEntropyLoss()
 edge_epochs = hp['edge_epochs']
+participating_ratio = hp['participating_ratio']

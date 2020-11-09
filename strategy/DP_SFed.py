@@ -3,8 +3,8 @@
 具体的客户端训练方案、通信内容等微观层面的行为在Client，Server类中定义
 """
 from DP_SFed_nodes.client import Client
-from DP_SFed_nodes.edge import EdgeSever
-from DP_SFed_nodes.cloud import CloudSever
+from DP_SFed_nodes.edge import Edge
+from DP_SFed_nodes.cloud import Cloud
 from configs import MODEL_NAME as model_name
 from configs import HYPER_PARAMETERS as hp
 from configs import client_outputs_path, output_grads_path
@@ -16,16 +16,23 @@ import os
 class DPSFedTrainer:
     def __init__(self):
         fed_log("A DPSFedTrainer is inited, this trainer use the strategy DP_SFed proposed by YangHe. \n")
-        clients_num = hp['n_clients']
-        edge_servers_num = 1
-
         # 构造客户端及相应的本地数据集
         local_dataloaders, local_sample_sizes, test_dataloader = get_data_loaders()
         self.clients = [Client(_id + 1, local_dataloaders[_id], sample_size)
                         for sample_size, _id in zip(local_sample_sizes, list(range(clients_num)))]
-        self.edge_servers = [EdgeSever(_id + 1, self.clients)
-                             for _id in range(edge_servers_num)]
-        self.cloud_server = CloudSever(self.clients, self.edge_servers, test_dataloader)
+
+        clients_per_edge = clients_num // edges_num
+        clients_for_edges = []
+        for i in range(0, clients_num, clients_per_edge):
+            if len(clients_for_edges) < edges_num - 1:
+                clients_for_edges.append(self.clients[i: min(i + clients_per_edge, clients_num)])
+            else:
+                clients_for_edges.append(self.clients[i:])
+                break
+        self.edges = [Edge(_id + 1, clients_for_edges[_id])
+                      for _id in range(edges_num)]
+
+        self.cloud = Cloud(self.edges, test_dataloader)
         self.communication_rounds = hp['communication_rounds']
         self.current_round = 0
         self.results = {'loss': [], 'accuracy': []}
@@ -33,7 +40,7 @@ class DPSFedTrainer:
         for client in self.clients:
             client.load_original_model()
 
-        for edge in self.edge_servers:
+        for edge in self.edges:
             edge.load_original_model()
 
     def begin_train(self):
@@ -49,15 +56,16 @@ class DPSFedTrainer:
         for client in self.clients:
             client.initialize()
             client.client_forward()
-        for edge in self.edge_servers:
+        for edge in self.edges:
             edge.initialize()
             edge.edge_forward_backward()
         for client in self.clients:
             client.client_backward()
-        self.cloud_server.aggregate()
+        self.cloud.initialize()
+        self.cloud.aggregate()
 
     def validation_step(self):
-        test_acc, test_l = self.cloud_server.validation()
+        test_acc, test_l = self.cloud.validation()
         fed_log(
             f"[Round: {self.current_round: 04}] Test set: Average loss: {test_l:.4f}, Accuracy: {test_acc:.4f}"
         )
@@ -68,3 +76,7 @@ class DPSFedTrainer:
 def clear_dir(path):
     for file in os.listdir(path):
         os.remove(os.path.join(path, file))
+
+
+clients_num = hp['n_clients']
+edges_num = hp['n_edges']
