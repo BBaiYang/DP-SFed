@@ -17,17 +17,17 @@ HYPER_PARAMETERS = {
     'global_epochs': 100,
     'edge_epochs': 20,
     'lr': .01,
-    'momentum_for_trainer': .9,
-    'momentum_for_BN': .1,
+    'momentum': .9,
     'sampling_pr': .02,
     'batch_size': 250,
     'n_clients': 10,
     'n_edges': 3,
     'classes_per_client': 4,
-    'balancedness': .7,
+    'balancedness': .96,
     'dataset': 'CIFAR10',
     'local_epochs': 1,
-    'participating_ratio': 1
+    'participating_ratio': .7,
+    'training_strategy': 'DP_SFed'
 }
 # ======================================
 

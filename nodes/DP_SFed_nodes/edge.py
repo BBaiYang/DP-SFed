@@ -28,6 +28,7 @@ class Edge:
         self.optimizer = optim.SGD(self.aggregated_model.parameters(), lr=lr, momentum=momentum)
 
     def initialize(self):
+        self.sample_size = 0
         if os.path.exists(edge_model_path):
             self.aggregated_model.load_state_dict(torch.load(edge_model_path))
         self.participating_clients = random.sample(self.clients, int(participating_ratio * len(self.clients)))
@@ -98,7 +99,7 @@ class Edge:
 
 device = hp['device']
 lr = hp['lr']
-momentum = hp['momentum_for_trainer']
+momentum = hp['momentum']
 loss = torch.nn.CrossEntropyLoss()
 edge_epochs = hp['edge_epochs']
 participating_ratio = hp['participating_ratio']

@@ -62,4 +62,4 @@ class Client:
 
 device = hp['device']
 lr = hp['lr']
-momentum = hp['momentum_for_trainer']
+momentum = hp['momentum']

@@ -60,12 +60,14 @@ class Cloud:
         self.test_loader = dataloader
 
     def initialize(self):
+        self.total_edge_data_size = 0
+        self.total_client_data_size = 0
         for k, edge in enumerate(self.edges):
             self.total_edge_data_size += edge.sample_size
             if k == 0:
-                self.clients = edge.participating_clients
+                self.clients = edge.participating_clients[:]
             else:
-                self.clients += edge.participating_clients
+                self.clients += edge.participating_clients[:]
         for client in self.clients:
             self.total_client_data_size += client.sample_size
 
@@ -74,6 +76,7 @@ class Cloud:
         aggregated_client_model = {}
         for k, client in enumerate(self.clients):
             weight = client.sample_size / self.total_client_data_size
+            # print(client.client_id, client.sample_size, self.total_client_data_size, weight)
             for name, param in client.model.state_dict().items():
                 if k == 0:
                     aggregated_client_model[name] = param.data * weight
@@ -88,6 +91,7 @@ class Cloud:
         for k, edge in enumerate(self.edges):
             sample_sizes[edge.edge_id] = edge.sample_size
             weight = edge.sample_size / self.total_edge_data_size
+            # print(edge.edge_id, edge.sample_size, self.total_edge_data_size, weight)
             for name, param in edge.aggregated_model.state_dict().items():
                 if k == 0:
                     aggregated_edge_model[name] = param.data * weight
@@ -100,9 +104,6 @@ class Cloud:
         self.edge_model.load_state_dict(aggregated_edge_model)
 
         self._save_params()
-
-        self.total_edge_data_size = 0
-        self.total_client_data_size = 0
 
     def validation(self):
         with torch.no_grad():
@@ -135,4 +136,3 @@ class Cloud:
 device = hp['device']
 loss = nn.CrossEntropyLoss()
 lr = hp['lr']
-momentum = hp['momentum_for_BN']

@@ -48,16 +48,13 @@ class VGG16(nn.Module):
                 layers += [nn.MaxPool2d(kernel_size=2, stride=2)]
             else:
                 layers += [nn.Conv2d(in_channels, x, kernel_size=3, padding=1),
-                           nn.BatchNorm2d(x, momentum=momentum),
+                           nn.BatchNorm2d(x),
                            nn.ReLU()]
                 in_channels = x
         layers += [nn.AvgPool2d(kernel_size=1, stride=1)]
         layers += [FlattenLayer()]
         layers += [nn.Linear(512, 10)]
         return nn.Sequential(*layers)
-
-
-momentum = hp['momentum_for_BN']
 
 
 if __name__ == '__main__':

@@ -53,15 +53,19 @@ class DPSFedTrainer:
             clear_dir(output_grads_path)
 
     def train_step(self):
-        for client in self.clients:
+        """客户端选择阶段"""
+        for edge in self.edges:
+            edge.initialize()
+        self.cloud.initialize()
+
+        """训练阶段"""
+        for client in self.cloud.clients:
             client.initialize()
             client.client_forward()
         for edge in self.edges:
-            edge.initialize()
             edge.edge_forward_backward()
-        for client in self.clients:
+        for client in self.cloud.clients:
             client.client_backward()
-        self.cloud.initialize()
         self.cloud.aggregate()
 
     def validation_step(self):
