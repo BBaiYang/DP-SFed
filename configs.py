@@ -13,21 +13,25 @@ DEBUG = 1
 HYPER_PARAMETERS = {
     'device': 'cuda: 3',
     'device_for_baseline': 'cuda: 2',
+    'dataset': 'CIFAR10',
+
     'communication_rounds': 2000,
     'global_epochs': 100,
-    'edge_epochs': 20,
-    'lr': .01,
-    'momentum': .9,
-    'sampling_pr': .02,
-    'batch_size': 250,
-    'n_clients': 10,
+    'n_clients': 50,
     'n_edges': 1,
     'classes_per_client': 4,
-    'balancedness': .95,
-    'dataset': 'CIFAR10',
-    'local_epochs': 1,
+    'balancedness': .97,
+    'record_step': 20,
+
+    'lr': .01,
+    'momentum': .9,
+
+    'training_strategy': 'DP_SFed',
+    'sampling_pr': .01,
     'participating_ratio': .7,
-    'training_strategy': 'DP_SFed'
+    'edge_epochs': 20,
+    'batch_size': 250,
+    'local_epochs': 1,
 }
 # ======================================
 

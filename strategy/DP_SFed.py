@@ -11,6 +11,7 @@ from configs import client_outputs_path, output_grads_path
 from utils import FED_LOG as fed_log
 from data_utils import get_data_loaders
 import os
+import torch
 
 
 class DPSFedTrainer:
@@ -51,6 +52,11 @@ class DPSFedTrainer:
             self.validation_step()
             clear_dir(client_outputs_path)
             clear_dir(output_grads_path)
+        torch.save(self.results,os.path.join('results',
+                                             f'{training_strategy}_'
+                                             f'sampling_pr_{sampling_pr}_'
+                                             f'participating_ratio_{participating_ratio}_'
+                                             f'edge_epochs_{edge_epochs}.pt'))
 
     def train_step(self):
         """客户端选择阶段"""
@@ -73,8 +79,9 @@ class DPSFedTrainer:
         fed_log(
             f"[Round: {self.current_round: 04}] Test set: Average loss: {test_l:.4f}, Accuracy: {test_acc:.4f}"
         )
-        self.results['loss'].append(test_l)
-        self.results['accuracy'].append(test_acc)
+        if self.current_round % record_step == 0:
+            self.results['loss'].append(test_l)
+            self.results['accuracy'].append(test_acc)
 
 
 def clear_dir(path):
@@ -84,3 +91,8 @@ def clear_dir(path):
 
 clients_num = hp['n_clients']
 edges_num = hp['n_edges']
+record_step = hp['record_step']
+training_strategy = hp['training_strategy']
+sampling_pr = hp['sampling_pr']
+participating_ratio = hp['participating_ratio']
+edge_epochs = hp['edge_epochs']
