@@ -11,7 +11,7 @@ DEBUG = 1
 """超参数设置,字典方式存储"""
 # ======================================
 HYPER_PARAMETERS = {
-    'device': 'cuda: 3',
+    'device': 'cuda: 2',
     'device_for_baseline': 'cuda: 2',
     'dataset': 'CIFAR10',
 
@@ -27,9 +27,9 @@ HYPER_PARAMETERS = {
     'momentum': .9,
 
     'training_strategy': 'DP_SFed',
-    'sampling_pr': .01,
+    'sampling_pr': .02,
     'participating_ratio': .7,
-    'edge_epochs': 20,
+    'edge_epochs': 30,
     'batch_size': 250,
     'local_epochs': 1,
 }
