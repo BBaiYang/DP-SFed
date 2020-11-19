@@ -12,7 +12,7 @@ DEBUG = 1
 # ======================================
 HYPER_PARAMETERS = {
     'device': 'cuda: 2',
-    'device_for_baseline': 'cuda: 2',
+    'device_for_baseline': 'cuda: 4',
     'dataset': 'CIFAR10',
 
     'communication_rounds': 2000,
