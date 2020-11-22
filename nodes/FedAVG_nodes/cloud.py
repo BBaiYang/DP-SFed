@@ -9,6 +9,7 @@ from configs import DATA_SET_NAME as data_set_name
 from configs import MODEL_NAME as model_name
 from configs import FedAVG_model_path, FedAVG_aggregated_model_path
 from utils import FED_LOG as fed_log
+import random
 
 
 class Accumulator:
@@ -45,7 +46,7 @@ def evaluate_accuracy(model, data_iter):
     return metric[0] / metric[2], metric[1] / metric[2]
 
 
-class CloudSever:
+class Cloud:
     def __init__(self, clients, dataloader):
         self.model = model_factory(data_set_name, model_name).to(device)
         print(self.model)
@@ -55,13 +56,20 @@ class CloudSever:
         for client in self.clients:
             self.total_size += client.sample_size
         self.test_loader = dataloader
+        self.participating_clients = None
+
+    def initialize(self):
+        self.total_size = 0
+        self.participating_clients = random.sample(self.clients, int(participating_ratio * len(self.clients)))
+        for client in self.participating_clients:
+            self.total_size += client.sample_size
 
     def aggregate(self):
         fed_log("Cloud server begins to aggregate client model...")
         aggregated_client_model = {}
-        for k, client in enumerate(self.clients):
+        for k, client in enumerate(self.participating_clients):
             weight = client.sample_size / self.total_size
-            print(f'{client.client_id}\'s weight is {weight}')
+            # print(f'{client.client_id}\'s weight is {weight}')
             for name, param in client.model.state_dict().items():
                 if k == 0:
                     aggregated_client_model[name] = param.data * weight
@@ -85,3 +93,4 @@ class CloudSever:
 
 device = hp['device']
 loss = nn.CrossEntropyLoss()
+participating_ratio = hp['participating_ratio']

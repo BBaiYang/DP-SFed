@@ -52,11 +52,11 @@ class DPSFedTrainer:
             self.validation_step()
             clear_dir(client_outputs_path)
             clear_dir(output_grads_path)
-        torch.save(self.results,os.path.join('results',
-                                             f'{training_strategy}_'
-                                             f'sampling_pr_{sampling_pr}_'
-                                             f'participating_ratio_{participating_ratio}_'
-                                             f'edge_epochs_{edge_epochs}.pt'))
+        torch.save(self.results, os.path.join('results',
+                                              f'{training_strategy}_'
+                                              f'sampling_pr_{sampling_pr}_'
+                                              f'participating_ratio_{participating_ratio}_'
+                                              f'edge_epochs_{edge_epochs}.pt'))
 
     def train_step(self):
         """客户端选择阶段"""

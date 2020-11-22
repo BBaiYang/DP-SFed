@@ -216,12 +216,24 @@ def get_data_loaders(verbose=True):
                              classes_per_client=hp['classes_per_client'], balancedness=hp['balancedness'],
                              verbose=verbose)
 
-    sampling_pr = hp["sampling_pr"]
-    client_loaders = [torch.utils.data.DataLoader(CustomImageDataset(x, y, transforms_train),
-                                                  batch_size=int(x.shape[0] * sampling_pr), shuffle=True) for x, y in split]
+    client_loaders = None
+    if training_strategy == 'DP_SFed':
+        client_loaders = [torch.utils.data.DataLoader(
+            CustomImageDataset(x, y, transforms_train),
+            batch_size=int(x.shape[0] * sampling_pr), shuffle=True) for x, y in split]
+    elif training_strategy == 'FedAVG':
+        client_loaders = [torch.utils.data.DataLoader(
+            CustomImageDataset(x, y, transforms_train),
+            batch_size=batch_size, shuffle=True) for x, y in split]
+
     test_loader = torch.utils.data.DataLoader(CustomImageDataset(x_test, y_test, transforms_eval),
                                               batch_size=hp['batch_size'], shuffle=False)
 
     stats = [x.shape[0] for x, y in split]
 
     return client_loaders, stats, test_loader
+
+
+training_strategy = hp['training_strategy']
+batch_size = hp['batch_size']
+sampling_pr = hp["sampling_pr"]

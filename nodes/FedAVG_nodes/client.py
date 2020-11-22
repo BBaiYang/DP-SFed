@@ -32,7 +32,7 @@ class Client:
             self.model.load_state_dict(torch.load(FedAVG_aggregated_model_path))
 
     def client_train(self):
-        fed_log(f"{self.client_id} trains the local model...")
+        # fed_log(f"{self.client_id} trains the local model...")
         for _ in range(self.local_epochs):
             for batch, (X, y) in enumerate(self.train_loader):
                 if batch % self.batches == self.current_round % self.batches:
