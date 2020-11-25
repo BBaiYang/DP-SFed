@@ -55,9 +55,11 @@ class FedAVGTrainer:
         fed_log(
             f"[Round: {self.current_round: 04}] Test set: Average loss: {test_l:.4f}, Accuracy: {test_acc:.4f}"
         )
-        self.results['loss'].append(test_l)
-        self.results['accuracy'].append(test_acc)
+        if self.current_round % record_step == 0:
+            self.results['loss'].append(test_l)
+            self.results['accuracy'].append(test_acc)
 
 
 participating_ratio = hp['participating_ratio']
 training_strategy = hp['training_strategy']
+record_step = hp['record_step']

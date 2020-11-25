@@ -5,7 +5,6 @@ import torch
 import torch.nn as nn
 from models.model_factory import model_factory
 from configs import HYPER_PARAMETERS as hp
-from configs import DATA_SET_NAME as data_set_name
 from configs import MODEL_NAME as model_name
 from configs import FedAVG_model_path, FedAVG_aggregated_model_path
 from utils import FED_LOG as fed_log
@@ -65,7 +64,7 @@ class Cloud:
             self.total_size += client.sample_size
 
     def aggregate(self):
-        fed_log("Cloud server begins to aggregate client model...")
+        # fed_log("Cloud server begins to aggregate client model...")
         aggregated_client_model = {}
         for k, client in enumerate(self.participating_clients):
             weight = client.sample_size / self.total_size
@@ -94,3 +93,4 @@ class Cloud:
 device = hp['device']
 loss = nn.CrossEntropyLoss()
 participating_ratio = hp['participating_ratio']
+data_set_name = hp['dataset']

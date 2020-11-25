@@ -27,15 +27,21 @@ class Animator:
 
 
 x = list(range(20, 2001, 20))
-result1 = torch.load('results/DP_SFed_sampling_pr_0.02_participating_ratio_0.3_edge_epochs_20.pt')['accuracy']
-result2 = torch.load('results/DP_SFed_sampling_pr_0.02_participating_ratio_0.5_edge_epochs_20.pt')['accuracy']
-result3 = torch.load('results/DP_SFed_sampling_pr_0.02_participating_ratio_0.7_edge_epochs_20.pt')['accuracy']
-legend1 = 'sampling_pr_0.02_participating_ratio_0.3_edge_epochs_20'
-legend2 = 'sampling_pr_0.02_participating_ratio_0.5_edge_epochs_20'
-legend3 = 'sampling_pr_0.02_participating_ratio_0.7_edge_epochs_20'
-results = [result1, result2, result3]
-legends = [legend1, legend2, legend3]
-fmts = ['r-', 'b-', 'k-']
+result1 = torch.load('results/CIFAR10_DP_SFed_sampling_pr_0.02_participating_ratio_0.3_edge_epochs_20.pt')['accuracy']
+result2 = torch.load('results/CIFAR10_DP_SFed_sampling_pr_0.02_participating_ratio_0.5_edge_epochs_20.pt')['accuracy']
+result3 = torch.load('results/CIFAR10_DP_SFed_sampling_pr_0.02_participating_ratio_0.7_edge_epochs_20.pt')['accuracy']
+fedavg_result_1 = torch.load('results/CIFAR10_FedAVG_participating_ratio_0.3.pt')['accuracy']
+fedavg_result_2 = torch.load('results/CIFAR10_FedAVG_participating_ratio_0.5.pt')['accuracy']
+fedavg_result_3 = torch.load('results/CIFAR10_FedAVG_participating_ratio_0.7.pt')['accuracy']
+legend1 = 'DP_SFed_sampling_pr_0.02_participating_ratio_0.3_edge_epochs_20'
+legend2 = 'DP_SFed_sampling_pr_0.02_participating_ratio_0.5_edge_epochs_20'
+legend3 = 'DP_SFed_sampling_pr_0.02_participating_ratio_0.7_edge_epochs_20'
+fedavg_legend_1 = 'FedAVG_participating_ratio_0.3.pt'
+fedavg_legend_2 = 'FedAVG_participating_ratio_0.5.pt'
+fedavg_legend_3 = 'FedAVG_participating_ratio_0.7.pt'
+results = [result1, result2, result3, fedavg_result_1, fedavg_result_2, fedavg_result_3]
+legends = [legend1, legend2, legend3, fedavg_legend_1, fedavg_legend_2, fedavg_legend_3]
+fmts = ['r-', 'b-', 'g-', 'k-', 'y-', 'm-']
 
 animator = Animator(x, results, x_label='communication_rounds', y_label='TestAcc', legends=legends, fmts=fmts)
 animator.display('plots/participating_ratio.png')

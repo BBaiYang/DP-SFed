@@ -53,6 +53,7 @@ class DPSFedTrainer:
             clear_dir(client_outputs_path)
             clear_dir(output_grads_path)
         torch.save(self.results, os.path.join('results',
+                                              f'{dataset_name}_'
                                               f'{training_strategy}_'
                                               f'sampling_pr_{sampling_pr}_'
                                               f'participating_ratio_{participating_ratio}_'
@@ -96,3 +97,4 @@ training_strategy = hp['training_strategy']
 sampling_pr = hp['sampling_pr']
 participating_ratio = hp['participating_ratio']
 edge_epochs = hp['edge_epochs']
+dataset_name = hp['dataset']

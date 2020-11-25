@@ -5,7 +5,6 @@ import torch
 import torch.nn as nn
 from models.model_factory import model_factory
 from configs import HYPER_PARAMETERS as hp
-from configs import DATA_SET_NAME as data_set_name
 from configs import MODEL_NAME as model_name
 from configs import initial_client_model_path, client_model_path, initial_edge_model_path, edge_model_path
 from utils import FED_LOG as fed_log
@@ -154,3 +153,4 @@ class Cloud:
 device = hp['device']
 loss = nn.CrossEntropyLoss()
 lr = hp['lr']
+data_set_name = hp['dataset']
