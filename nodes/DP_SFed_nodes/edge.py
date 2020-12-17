@@ -8,6 +8,7 @@ from configs import HYPER_PARAMETERS as hp
 import torch
 import os
 import random
+from compression import np_fourD_compound
 
 
 class Edge:
@@ -71,7 +72,13 @@ class Edge:
             for client in self.participating_clients:
                 client_id = client.client_id
                 # fed_log(f'{self.edge_id} uses data from {client_id}...')
-                X, y = torch.load(os.path.join(client_outputs_path, f'{client_id}_to_{self.edge_id}.pt'))
+                # X, y = torch.load(os.path.join(client_outputs_path, f'{client_id}_to_{self.edge_id}.pt'))
+                # Compound
+                U, S, VT, y = torch.load(os.path.join(client_outputs_path, f'{client_id}_to_{self.edge_id}.pt'))
+                X = torch.tensor(np_fourD_compound(U, S, VT), dtype=torch.float32).to(device)
+                X.requires_grad_(True)
+                # Compound End
+
                 client_step_sizes.append(len(X))
                 if (features, labels) == (None, None):
                     features, labels = X, y.to(device)

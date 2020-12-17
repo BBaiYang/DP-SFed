@@ -85,31 +85,14 @@ class Cloud:
 
         # fed_log("Cloud server begins to aggregate edge model...")
         aggregated_edge_model = {}
-        # local_running_means = {}
-        # sample_sizes = []
         for k, edge in enumerate(self.edges):
-            # sample_sizes.append(edge.sample_size)
             weight = edge.sample_size / self.total_edge_data_size
             # print(edge.edge_id, edge.sample_size, self.total_edge_data_size, weight)
             for name, param in edge.aggregated_model.state_dict().items():
                 if k == 0:
                     aggregated_edge_model[name] = param.data * weight
-                    # if 'running_mean' in name:
-                    #     local_running_means[name] = [param.data]
                 else:
                     aggregated_edge_model[name] += param.data * weight
-                    # if 'running_mean' in name:
-                    #     local_running_means[name] += [param.data]
-        #
-        # aggregated_running_means = {}
-        # for name, param in aggregated_edge_model.items():
-        #     if 'running_mean' in name:
-        #         aggregated_running_means[name] = param.data
-        #     if 'running_var' in name:
-        #         key = name.replace('running_var', 'running_mean')
-        #         param.data += self._rectify_running_var(
-        #             local_running_means[key], aggregated_running_means[key], sample_sizes)
-
         self.edge_model.load_state_dict(aggregated_edge_model)
         self._save_params()
 
@@ -138,19 +121,9 @@ class Cloud:
         torch.save(self.client_model.state_dict(), client_model_path)
         torch.save(self.edge_model.state_dict(), edge_model_path)
 
-    # def _rectify_running_var(self, local_running_means, running_mean, sample_sizes):
-    #     complementary_running_var = None
-    #     for i, (local_running_mean, sample_size) in enumerate(zip(local_running_means, sample_sizes)):
-    #         if i == 0:
-    #             complementary_running_var = (local_running_mean - running_mean).pow(2) * sample_size
-    #         else:
-    #             complementary_running_var += (local_running_mean - running_mean).pow(2) * sample_size
-    #     complementary_running_var /= self.total_edge_data_size
-    #     complementary_running_var *= .9
-    #     return complementary_running_var
-
 
 device = hp['device']
 loss = nn.CrossEntropyLoss()
 lr = hp['lr']
 data_set_name = hp['dataset']
+bn_momentum = hp['bn_momentum']

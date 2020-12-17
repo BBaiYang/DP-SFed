@@ -8,6 +8,7 @@ from configs import HYPER_PARAMETERS as hp
 from configs import initial_client_model_path, client_model_path, client_outputs_path, output_grads_path
 import os
 from torch.utils.checkpoint import checkpoint
+from compression import np_fourD_SVD
 
 
 class Client:
@@ -43,7 +44,12 @@ class Client:
                 X = X.to(device)
                 X.requires_grad_(True)
                 self.output = checkpoint(self.model, X)
-                self.send_to_edge((self.output, y))
+
+                # Compress
+                U, S, VT = np_fourD_SVD(self.output.cpu().detach().numpy(), compress_ratio=compress_ratio)
+                self.send_to_edge((U, S, VT, y))
+                # Compress End
+                # self.send_to_edge((self.output, y))
             else:
                 continue
         self.current_round += 1
@@ -63,3 +69,4 @@ class Client:
 device = hp['device']
 lr = hp['lr']
 momentum = hp['momentum']
+compress_ratio = hp['compress_ratio']

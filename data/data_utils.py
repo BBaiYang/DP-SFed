@@ -70,6 +70,8 @@ def split_image_data(data, labels, n_clients=10, classes_per_client=10, shuffle=
     n_labels = np.max(labels) + 1
 
     if balancedness >= 1.0:
+        # eg: n_data = 100, n_clients = 10, data_per_client = [10, 10, 10, 10, 10, 10, 10, 10, 10, 10]
+        # class_per_client = 4, data_per_client_per_class = [2, 2, 2, 2, 2, 2, 2, 2, 2, 2]
         data_per_client = [n_data // n_clients] * n_clients
         data_per_client_per_class = [data_per_client[0] // classes_per_client] * n_clients
     else:
@@ -87,9 +89,11 @@ def split_image_data(data, labels, n_clients=10, classes_per_client=10, shuffle=
         exit()
 
     # sort for labels
+    # n_labels = 10, data_idcs = [[], [], [], [], [], [], [], [], [], []]
     data_idcs = [[] for i in range(n_labels)]
     for j, label in enumerate(labels):
         data_idcs[label] += [j]
+    # data_idcs = [[0], [1], [2], [3], ]
     if shuffle:
         for idcs in data_idcs:
             np.random.shuffle(idcs)
