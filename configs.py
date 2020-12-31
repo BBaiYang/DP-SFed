@@ -27,7 +27,7 @@ HYPER_PARAMETERS = {
     'lr': .01,
     'momentum': .9,
     'bn_momentum': .1,
-    'l2_norm_clip': 1,
+    'l2_norm_clip': .1,
     'sigma': 2,
 
     # FedAVG, DP_SFed,
