@@ -11,31 +11,33 @@ DEBUG = 1
 """超参数设置,字典方式存储"""
 # ======================================
 HYPER_PARAMETERS = {
-    'device': 'cuda: 4',
+    'device': 'cuda: 0',
     'device_for_baseline': 'cuda: 4',
     # FashionMNIST, CIFAR10
     'dataset': 'CIFAR10',
 
     'communication_rounds': 2000,
-    'record_step': 20,
+    'record_step': 10,
     'global_epochs': 100,
     'n_clients': 100,
-    'n_edges': 1,
+    'n_edges': 3,
     'classes_per_client': 3,
-    'balancedness': .996,
+    'balancedness': .995,
 
     'lr': .01,
     'momentum': .9,
     'bn_momentum': .1,
+    'l2_norm_clip': 1,
+    'sigma': 2,
 
     # FedAVG, DP_SFed,
     'training_strategy': 'DP_SFed',
-    'sampling_pr': .01,
-    'participating_ratio': .5,
-    'compress_ratio': .2,
-    'edge_epochs': 20,
+    'sampling_pr': .02,
+    'participating_ratio': .7,
+    'compress_ratio': .3,
+    'edge_epochs': 10,
     'batch_size': 200,
-    'local_epochs': 20,
+    'local_epochs': 1,
 }
 # ======================================
 
@@ -55,7 +57,6 @@ FedAVG_aggregated_model_path = 'intermediate_variables/FedAVG_aggregated_model.p
 # 首先需要在这里先设计好最终所需要模型的整体结构，将此类实例化作为参数传给联邦学习训练器
 # 因为描述模型设计参数较多，不适合设计成传参再构造网络的方式，这里就直接编辑类定义再实例化
 # 可用参数：
-#            MINIST : CNN
 #            FashionMNIST : CNN
 #            CIFAR10 : VGG16
 

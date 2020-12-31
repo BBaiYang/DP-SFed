@@ -2,13 +2,13 @@
 edge server
 """
 from utils import FED_LOG as fed_log
+from utils import np_fourD_compound
 import torch.optim as optim
 from configs import initial_edge_model_path, edge_model_path, client_outputs_path, output_grads_path
 from configs import HYPER_PARAMETERS as hp
 import torch
 import os
 import random
-from compression import np_fourD_compound
 
 
 class Edge:
@@ -36,32 +36,6 @@ class Edge:
         for client in self.participating_clients:
             self.sample_size += client.sample_size
 
-    # def edge_forward_backward(self):
-    #     for client in self.clients:
-    #         client_id = client.client_id
-    #         fed_log(f'{self.edge_id} uses data from {client_id}...')
-    #         X, y = torch.load(os.path.join(client_outputs_path, f'{client_id}_to_{self.edge_id}.pt'))
-    #         # X.retain_grad()
-    #         self.optimizers[client_id].zero_grad()
-    #         train_l = loss(self.models[client_id](X), y.to(device))
-    #         train_l.backward()
-    #         self.optimizers[client_id].step()
-    #         # torch.save(X.grad, os.path.join(output_grads_path, f'{self.edge_id}_to_{client_id}.pt'))
-    #     self.aggregate_client_models()
-
-    # def aggregate_client_models(self):
-    #     aggregated_weight = {}
-    #     for k, client in enumerate(self.clients):
-    #         client_id = client.client_id
-    #         weight = client.sample_size / self.sample_size
-    #         for name, param in self.models[client_id].named_parameters():
-    #             if k == 0:
-    #                 aggregated_weight[name] = param.data * weight
-    #             else:
-    #                 aggregated_weight[name] += param.data * weight
-    #     for name, param in self.aggregated_model.named_parameters():
-    #         param.data = aggregated_weight[name]
-
     def edge_forward_backward(self):
         features = None
         labels = None
@@ -72,13 +46,14 @@ class Edge:
             for client in self.participating_clients:
                 client_id = client.client_id
                 # fed_log(f'{self.edge_id} uses data from {client_id}...')
-                # X, y = torch.load(os.path.join(client_outputs_path, f'{client_id}_to_{self.edge_id}.pt'))
-                # Compound
-                U, S, VT, y = torch.load(os.path.join(client_outputs_path, f'{client_id}_to_{self.edge_id}.pt'))
-                X = torch.tensor(np_fourD_compound(U, S, VT), dtype=torch.float32).to(device)
-                X.requires_grad_(True)
-                # Compound End
-
+                if compress_ratio < 1.:
+                    # Compound
+                    U, S, VT, y = torch.load(os.path.join(client_outputs_path, f'{client_id}_to_{self.edge_id}.pt'))
+                    X = torch.tensor(np_fourD_compound(U, S, VT), dtype=torch.float32).to(device)
+                    X.requires_grad_(True)
+                    # Compound End
+                else:
+                    X, y = torch.load(os.path.join(client_outputs_path, f'{client_id}_to_{self.edge_id}.pt'))
                 client_step_sizes.append(len(X))
                 if (features, labels) == (None, None):
                     features, labels = X, y.to(device)
@@ -110,3 +85,4 @@ momentum = hp['momentum']
 loss = torch.nn.CrossEntropyLoss()
 edge_epochs = hp['edge_epochs']
 participating_ratio = hp['participating_ratio']
+compress_ratio = hp['compress_ratio']

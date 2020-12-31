@@ -4,11 +4,12 @@ client in DP_SFed
 import torch
 import torch.optim as optim
 from utils import FED_LOG as fed_log
+from utils import np_fourD_SVD
 from configs import HYPER_PARAMETERS as hp
 from configs import initial_client_model_path, client_model_path, client_outputs_path, output_grads_path
 import os
 from torch.utils.checkpoint import checkpoint
-from compression import np_fourD_SVD
+from pyvacy import optim as dp_optim
 
 
 class Client:
@@ -19,11 +20,11 @@ class Client:
         self.current_round = 0
         self.batches = len(self.train_loader)
         self.sample_size = sample_size
+        self.participate_example_size = int(self.sample_size * sampling_pr)
         self.edge_server = None
         self.model = None
         self.optimizer = None
         self.output = None
-
         print(self.client_id, self.sample_size)
 
     def set_edge_server(self, edge_server):
@@ -31,7 +32,10 @@ class Client:
 
     def load_original_model(self):
         self.model = torch.load(initial_client_model_path)
-        self.optimizer = optim.SGD(self.model.parameters(), lr=lr, momentum=momentum)
+        # self.optimizer = optim.SGD(self.model.parameters(), lr=lr, momentum=momentum)
+        self.optimizer = dp_optim.DPSGD(l2_norm_clip=l2_norm_clip, noise_multiplier=sigma,
+                                        batch_size=self.participate_example_size,
+                                        params=self.model.parameters(), lr=lr, momentum=momentum)
 
     def initialize(self):
         if os.path.exists(client_model_path):
@@ -44,12 +48,15 @@ class Client:
                 X = X.to(device)
                 X.requires_grad_(True)
                 self.output = checkpoint(self.model, X)
-
-                # Compress
-                U, S, VT = np_fourD_SVD(self.output.cpu().detach().numpy(), compress_ratio=compress_ratio)
-                self.send_to_edge((U, S, VT, y))
-                # Compress End
-                # self.send_to_edge((self.output, y))
+                if compress_ratio < 1:
+                    # Compress
+                    U, S, VT, Transitions = np_fourD_SVD(self.output.cpu().detach().numpy(), compress_ratio=compress_ratio)
+                    self.send_to_edge((U, S, VT, y))
+                    # Compress End
+                    Transitions = torch.tensor(Transitions, dtype=torch.float32).to(device)
+                    self.output = torch.matmul(Transitions, self.output)
+                else:
+                    self.send_to_edge((self.output, y))
             else:
                 continue
         self.current_round += 1
@@ -70,3 +77,6 @@ device = hp['device']
 lr = hp['lr']
 momentum = hp['momentum']
 compress_ratio = hp['compress_ratio']
+sampling_pr = hp['sampling_pr']
+l2_norm_clip = hp['l2_norm_clip']
+sigma = hp['sigma']

@@ -57,7 +57,9 @@ class DPSFedTrainer:
                                               f'{training_strategy}_'
                                               f'sampling_pr_{sampling_pr}_'
                                               f'participating_ratio_{participating_ratio}_'
-                                              f'edge_epochs_{edge_epochs}.pt'))
+                                              f'edge_epochs_{edge_epochs}_'
+                                              f'compression_ratio_{compression_ratio}_'
+                                              f'sigma_{sigma}.pt'))
 
     def train_step(self):
         """客户端选择阶段"""
@@ -97,4 +99,6 @@ training_strategy = hp['training_strategy']
 sampling_pr = hp['sampling_pr']
 participating_ratio = hp['participating_ratio']
 edge_epochs = hp['edge_epochs']
+compression_ratio = hp['compress_ratio']
 dataset_name = hp['dataset']
+sigma = hp['sigma']
