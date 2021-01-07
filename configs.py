@@ -11,7 +11,7 @@ DEBUG = 1
 """超参数设置,字典方式存储"""
 # ======================================
 HYPER_PARAMETERS = {
-    'device': 'cuda: 0',
+    'device': 'cuda: 4',
     'device_for_baseline': 'cuda: 4',
     # FashionMNIST, CIFAR10
     'dataset': 'CIFAR10',
@@ -24,20 +24,22 @@ HYPER_PARAMETERS = {
     'classes_per_client': 3,
     'balancedness': .995,
 
-    'lr': .01,
+    'lr': .017,
     'momentum': .9,
     'bn_momentum': .1,
     'l2_norm_clip': .1,
-    'sigma': 2,
-
-    # FedAVG, DP_SFed,
     'training_strategy': 'DP_SFed',
-    'sampling_pr': .02,
+    'edge_epochs': 10,
+
+    # DP_SFed,
+    'sampling_pr': .03,
+    'sigma': 2,
     'participating_ratio': .7,
     'compress_ratio': .3,
-    'edge_epochs': 10,
+
+    # FedAVG
     'batch_size': 200,
-    'local_epochs': 1,
+    'local_epochs': 10,
 }
 # ======================================
 

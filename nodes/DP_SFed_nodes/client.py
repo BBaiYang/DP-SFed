@@ -4,12 +4,12 @@ client in DP_SFed
 import torch
 import torch.optim as optim
 from utils import FED_LOG as fed_log
-from utils import np_fourD_SVD
+from utils import np_fourD_SVD, DPSGD
 from configs import HYPER_PARAMETERS as hp
 from configs import initial_client_model_path, client_model_path, client_outputs_path, output_grads_path
 import os
 from torch.utils.checkpoint import checkpoint
-from pyvacy import optim as dp_optim
+# from pyvacy import optim as dp_optim
 
 
 class Client:
@@ -33,9 +33,9 @@ class Client:
     def load_original_model(self):
         self.model = torch.load(initial_client_model_path)
         # self.optimizer = optim.SGD(self.model.parameters(), lr=lr, momentum=momentum)
-        self.optimizer = dp_optim.DPSGD(l2_norm_clip=l2_norm_clip, noise_multiplier=sigma,
-                                        batch_size=self.participate_example_size,
-                                        params=self.model.parameters(), lr=lr, momentum=momentum)
+        self.optimizer = DPSGD(l2_norm_clip=l2_norm_clip, noise_multiplier=sigma,
+                               batch_size=self.participate_example_size, device=device,
+                               params=self.model.parameters(), lr=lr, momentum=momentum)
 
     def initialize(self):
         if os.path.exists(client_model_path):
