@@ -9,7 +9,6 @@ from configs import HYPER_PARAMETERS as hp
 from configs import initial_client_model_path, client_model_path, client_outputs_path, output_grads_path
 import os
 from torch.utils.checkpoint import checkpoint
-# from pyvacy import optim as dp_optim
 
 
 class Client:

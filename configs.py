@@ -11,7 +11,7 @@ DEBUG = 1
 """超参数设置,字典方式存储"""
 # ======================================
 HYPER_PARAMETERS = {
-    'device': 'cuda: 4',
+    'device': 'cuda: 9',
     'device_for_baseline': 'cuda: 4',
     # FashionMNIST, CIFAR10
     'dataset': 'CIFAR10',
@@ -24,18 +24,21 @@ HYPER_PARAMETERS = {
     'classes_per_client': 3,
     'balancedness': .995,
 
-    'lr': .017,
+    'lr': .015,
     'momentum': .9,
     'bn_momentum': .1,
-    'l2_norm_clip': .1,
+
+    # DP_SFed, FedAVG
     'training_strategy': 'DP_SFed',
-    'edge_epochs': 10,
 
     # DP_SFed,
     'sampling_pr': .03,
     'sigma': 2,
-    'participating_ratio': .7,
+    'participating_ratio': .5,
     'compress_ratio': .3,
+    # fixed: CIFAR10: .1, 10 FMNIST: unknown
+    'l2_norm_clip': 1,
+    'edge_epochs': 10,
 
     # FedAVG
     'batch_size': 200,
@@ -60,7 +63,7 @@ FedAVG_aggregated_model_path = 'intermediate_variables/FedAVG_aggregated_model.p
 # 因为描述模型设计参数较多，不适合设计成传参再构造网络的方式，这里就直接编辑类定义再实例化
 # 可用参数：
 #            FashionMNIST : CNN
-#            CIFAR10 : VGG16
+#            CIFAR10 : VGG16, ResNet18
 
 MODEL_NAME = 'VGG16'
 # ======================================

@@ -28,8 +28,8 @@ class Animator:
 
 x = list(range(10, 2001, 10))
 # result1 = torch.load('results/CIFAR10_DP_SFed_sampling_pr_0.02_participating_ratio_0.3_edge_epochs_20.pt')['accuracy']
-# result2 = torch.load('results/CIFAR10_DP_SFed_sampling_pr_0.02_participating_ratio_0.5_edge_epochs_20.pt')['accuracy']
-result3 = torch.load('results/CIFAR10_DP_SFed_sampling_pr_0.02_participating_ratio_0.7_edge_epochs_5_compression_ratio_0.3.pt')['accuracy']
+result2 = torch.load('results/CIFAR10_DP_SFed_sampling_pr_0.03_participating_ratio_0.7_edge_epochs_10_compression_ratio_0.3_sigma_2.pt')['accuracy']
+result3 = torch.load('results/CIFAR10_DP_SFed_sampling_pr_0.03_participating_ratio_0.5_edge_epochs_10_compression_ratio_0.3_sigma_2.pt')['accuracy']
 # fedavg_result_1 = torch.load('results/CIFAR10_FedAVG_participating_ratio_0.3.pt')['accuracy']
 # fedavg_result_2 = torch.load('results/CIFAR10_FedAVG_participating_ratio_0.5.pt')['accuracy']
 # fedavg_result_3 = torch.load('results/CIFAR10_FedAVG_participating_ratio_0.7.pt')['accuracy']
@@ -43,7 +43,7 @@ result3 = torch.load('results/CIFAR10_DP_SFed_sampling_pr_0.02_participating_rat
 # legends = [legend1, legend2, legend3, fedavg_legend_1, fedavg_legend_2, fedavg_legend_3]
 # fmts = ['r-', 'b-', 'g-', 'k-', 'y-', 'm-']
 #
-animator = Animator(x, [result3], x_label='communication_rounds', y_label='TestAcc', legends=['20'], fmts=['r-'])
+animator = Animator(x, [result2, result3], x_label='communication_rounds', y_label='TestAcc', legends=['0.5', '0.7'], fmts=['b-', 'r-'])
 animator.display('plots/participating_ratio.png')
 
 for i, acc in enumerate(result3):
