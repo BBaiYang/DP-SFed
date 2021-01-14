@@ -33,11 +33,11 @@ HYPER_PARAMETERS = {
 
     # DP_SFed,
     'sampling_pr': .03,
-    'sigma': 2,
+    'sigma': 20,
     'participating_ratio': .5,
     'compress_ratio': .3,
     # fixed: CIFAR10: .1, 10 FMNIST: unknown
-    'l2_norm_clip': 1,
+    'l2_norm_clip': .1,
     'edge_epochs': 10,
 
     # FedAVG

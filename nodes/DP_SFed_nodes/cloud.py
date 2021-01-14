@@ -105,11 +105,11 @@ class Cloud:
         client_model = None
         edge_model = None
         if 'CNN' in model_name or 'ResNet' in model_name:
-            client_model = nn.Sequential(*list(self.model.children())[:2])
-            edge_model = nn.Sequential(*list(self.model.children())[2:])
+            client_model = nn.Sequential(*list(self.model.children())[:1])
+            edge_model = nn.Sequential(*list(self.model.children())[1:])
         if 'VGG' in model_name:
-            client_model = list(self.model.children())[0][:4]
-            edge_model = list(self.model.children())[0][4:]
+            client_model = list(self.model.children())[0][:1]
+            edge_model = list(self.model.children())[0][1:]
         return client_model, edge_model
 
     def _save_model(self):
