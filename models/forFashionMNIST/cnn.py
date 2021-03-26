@@ -4,7 +4,6 @@ import torchvision
 from torchvision import transforms
 from torch.utils import data
 from configs import HYPER_PARAMETERS as hyper_parameters
-from utils import FED_LOG as fed_log
 
 
 class Accumulator:
@@ -116,5 +115,5 @@ if __name__ == '__main__':
             trainer.step()
             with torch.no_grad():
                 test_acc, test_l = evaluate_accuracy(net, test_loader, loss, device)
-                fed_log(f"[Round: {epoch * batches + batch + 1: 04}] "
+                print(f"[Round: {epoch * batches + batch + 1: 04}] "
                         f"Test set: Average loss: {test_l:.4f}, Accuracy: {test_acc:.4f}")

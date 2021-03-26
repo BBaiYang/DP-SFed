@@ -5,9 +5,7 @@ import torch
 import torch.nn as nn
 from models.model_factory import model_factory
 from configs import HYPER_PARAMETERS as hp
-from configs import MODEL_NAME as model_name
 from configs import initial_client_model_path, client_model_path, initial_edge_model_path, edge_model_path
-from utils import FED_LOG as fed_log
 
 
 class Accumulator:
@@ -48,10 +46,13 @@ def evaluate_accuracy(client_model, edge_model, data_iter):
 
 class Cloud:
     def __init__(self, edges, dataloader):
+        # init global model, edge-side model and client-side model
         self.model = model_factory(data_set_name, model_name).to(device)
         self.client_model, self.edge_model = self._split_model()
         print(f'model:\n{self.model}\nclient_model:\n{self.client_model}\nedge_model:\n{self.edge_model}')
         self._save_model()
+
+        # Initial phase
         self.clients = None
         self.edges = edges
         self.total_client_data_size = 0
@@ -62,19 +63,19 @@ class Cloud:
         self.total_edge_data_size = 0
         self.total_client_data_size = 0
         for k, edge in enumerate(self.edges):
-            self.total_edge_data_size += edge.sample_size
+            self.total_edge_data_size += edge.data_size
             if k == 0:
                 self.clients = edge.participating_clients[:]
             else:
                 self.clients += edge.participating_clients[:]
         for client in self.clients:
-            self.total_client_data_size += client.sample_size
+            self.total_client_data_size += client.data_size
 
     def aggregate(self):
-        # fed_log("Cloud server begins to aggregate client model...")
+        # print("Cloud server begins to aggregate client model...")
         aggregated_client_model = {}
         for k, client in enumerate(self.clients):
-            weight = client.sample_size / self.total_client_data_size
+            weight = client.data_size / self.total_client_data_size
             # print(client.client_id, client.sample_size, self.total_client_data_size, weight)
             for name, param in client.model.state_dict().items():
                 if k == 0:
@@ -83,10 +84,10 @@ class Cloud:
                     aggregated_client_model[name] += param.data * weight
         self.client_model.load_state_dict(aggregated_client_model)
 
-        # fed_log("Cloud server begins to aggregate edge model...")
+        # print("Cloud server begins to aggregate edge model...")
         aggregated_edge_model = {}
         for k, edge in enumerate(self.edges):
-            weight = edge.sample_size / self.total_edge_data_size
+            weight = edge.data_size / self.total_edge_data_size
             # print(edge.edge_id, edge.sample_size, self.total_edge_data_size, weight)
             for name, param in edge.aggregated_model.state_dict().items():
                 if k == 0:
@@ -102,18 +103,16 @@ class Cloud:
         return test_acc, test_l
 
     def _split_model(self):
-        client_model = None
-        edge_model = None
-        if 'CNN' in model_name or 'ResNet' in model_name:
-            client_model = nn.Sequential(*list(self.model.children())[:1])
-            edge_model = nn.Sequential(*list(self.model.children())[1:])
         if 'VGG' in model_name:
             client_model = list(self.model.children())[0][:1]
             edge_model = list(self.model.children())[0][1:]
+        else:
+            client_model = nn.Sequential(*list(self.model.children())[:1])
+            edge_model = nn.Sequential(*list(self.model.children())[1:])
         return client_model, edge_model
 
     def _save_model(self):
-        fed_log('initialize the model...')
+        print('initialize the model...')
         torch.save(self.client_model, initial_client_model_path)
         torch.save(self.edge_model, initial_edge_model_path)
 
@@ -127,3 +126,4 @@ loss = nn.CrossEntropyLoss()
 lr = hp['lr']
 data_set_name = hp['dataset']
 bn_momentum = hp['bn_momentum']
+model_name = hp['model_name']

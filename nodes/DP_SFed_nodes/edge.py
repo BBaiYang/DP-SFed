@@ -1,8 +1,7 @@
 """
 edge server
 """
-from utils import FED_LOG as fed_log
-from utils import np_fourD_compound
+from _utils.calculation_utils import np_fourD_compound
 import torch.optim as optim
 from configs import initial_edge_model_path, edge_model_path, client_outputs_path, output_grads_path
 from configs import HYPER_PARAMETERS as hp
@@ -15,7 +14,7 @@ class Edge:
     def __init__(self, edge_id, clients):
         self.edge_id = f'edge_{edge_id}'
         self.clients = clients
-        self.sample_size = 0
+        self.data_size = 0
         self.models = {}
         self.optimizers = {}
         self.aggregated_model = None
@@ -26,15 +25,16 @@ class Edge:
 
     def load_original_model(self):
         self.aggregated_model = torch.load(initial_edge_model_path)
-        self.optimizer = optim.SGD(self.aggregated_model.parameters(), lr=lr, momentum=momentum)
+        self.optimizer = optim.SGD(self.aggregated_model.parameters(), lr=lr,
+                                   momentum=momentum, weight_decay=weight_decay)
 
     def initialize(self):
-        self.sample_size = 0
+        self.data_size = 0
         if os.path.exists(edge_model_path):
             self.aggregated_model.load_state_dict(torch.load(edge_model_path))
-        self.participating_clients = random.sample(self.clients, int(participating_ratio * len(self.clients)))
+        self.participating_clients = random.sample(self.clients, int(participating_ratio * len(self.clients))+1)
         for client in self.participating_clients:
-            self.sample_size += client.sample_size
+            self.data_size += client.data_size
 
     def edge_forward_backward(self):
         features = None
@@ -45,8 +45,8 @@ class Edge:
                 features, labels = None, None
             for client in self.participating_clients:
                 client_id = client.client_id
-                # fed_log(f'{self.edge_id} uses data from {client_id}...')
-                if compress_ratio < 1.:
+                # print(f'{self.edge_id} uses data from {client_id}...')
+                if compress_ratio < 0.5:
                     # Compound
                     U, S, VT, y = torch.load(os.path.join(client_outputs_path, f'{client_id}_to_{self.edge_id}.pt'))
                     X = torch.tensor(np_fourD_compound(U, S, VT), dtype=torch.float32).to(device)
@@ -86,3 +86,4 @@ loss = torch.nn.CrossEntropyLoss()
 edge_epochs = hp['edge_epochs']
 participating_ratio = hp['participating_ratio']
 compress_ratio = hp['compress_ratio']
+weight_decay = hp['weight_decay']

@@ -120,7 +120,7 @@ def split_image_data(data, labels, n_clients=10, classes_per_client=10, shuffle=
         print("Data split:")
         for i, client in enumerate(clients_split):
             split = np.sum(client[1].reshape(1, -1) == np.arange(n_labels).reshape(-1, 1), axis=1)
-            print(" - Client {}: {}".format(i, split))
+            print(" - Client {}: {}".format(i + 1, split))
         print()
 
     if verbose:

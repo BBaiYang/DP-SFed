@@ -5,9 +5,7 @@ import torch
 import torch.nn as nn
 from models.model_factory import model_factory
 from configs import HYPER_PARAMETERS as hp
-from configs import MODEL_NAME as model_name
 from configs import FedAVG_model_path, FedAVG_aggregated_model_path
-from utils import FED_LOG as fed_log
 import random
 
 
@@ -53,7 +51,7 @@ class Cloud:
         self.clients = clients
         self.total_size = 0
         for client in self.clients:
-            self.total_size += client.sample_size
+            self.total_size += client.data_size
         self.test_loader = dataloader
         self.participating_clients = None
 
@@ -61,13 +59,13 @@ class Cloud:
         self.total_size = 0
         self.participating_clients = random.sample(self.clients, int(participating_ratio * len(self.clients)))
         for client in self.participating_clients:
-            self.total_size += client.sample_size
+            self.total_size += client.data_size
 
     def aggregate(self):
-        # fed_log("Cloud server begins to aggregate client model...")
+        # print("Cloud server begins to aggregate client model...")
         aggregated_client_model = {}
         for k, client in enumerate(self.participating_clients):
-            weight = client.sample_size / self.total_size
+            weight = client.data_size / self.total_size
             # print(f'{client.client_id}\'s weight is {weight}')
             for name, param in client.model.state_dict().items():
                 if k == 0:
@@ -83,7 +81,7 @@ class Cloud:
         return test_acc, test_l
 
     def _save_model(self):
-        fed_log('initialize the model...')
+        print('initialize the model...')
         torch.save(self.model, FedAVG_model_path)
 
     def _save_params(self):
@@ -94,3 +92,4 @@ device = hp['device']
 loss = nn.CrossEntropyLoss()
 participating_ratio = hp['participating_ratio']
 data_set_name = hp['dataset']
+model_name = hp['model_name']

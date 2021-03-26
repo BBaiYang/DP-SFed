@@ -1,11 +1,10 @@
 import torch.nn as nn
-from forFashionMNIST.cnn import evaluate_accuracy
+from models.forFashionMNIST.cnn import evaluate_accuracy
 import torchvision
 from torchvision import transforms
 from configs import HYPER_PARAMETERS as hp
 import torch
 from torch.utils import data
-from utils import FED_LOG as fed_log
 
 
 cfg = {
@@ -98,7 +97,7 @@ if __name__ == '__main__':
             trainer.step()
             with torch.no_grad():
                 test_acc, test_l = evaluate_accuracy(net, test_loader, loss, device)
-                fed_log(f"[Round: {epoch * batches + batch + 1: 04}] "
+                print(f"[Round: {epoch * batches + batch + 1: 04}] "
                         f"Test set: Average loss: {test_l:.4f}, Accuracy: {test_acc:.4f}")
 
     # train_dataloaders, local_sample_sizes, test_dataloader = get_data_loaders()
@@ -122,5 +121,5 @@ if __name__ == '__main__':
     #         trainer.step()
     #         with torch.no_grad():
     #             test_acc, test_l = evaluate_accuracy(net, test_dataloader, loss, device)
-    #             fed_log(f"[Round: {epoch * batches + batch + 1: 04}] "
+    #             print(f"[Round: {epoch * batches + batch + 1: 04}] "
     #                     f"Test set: Average loss: {test_l:.4f}, Accuracy: {test_acc:.4f}")

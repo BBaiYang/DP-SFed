@@ -1,30 +1,9 @@
-# -*- coding: utf-8 -*-
-"""
-提供一些工具函数
-"""
-
 import numpy as np
-from configs import DEBUG as debug
-from scipy.linalg import eigh as largest_eigh
-import torch
 from torch.distributions.normal import Normal
 from torch.optim import SGD
-
-"""打印详细日志"""
-
-
-def FED_LOG(*kwargs):
-    if debug:
-        print(*kwargs)
-
-
-"""输出关键信息"""
-
-
-def FED_WRITE(*kwargs):
-    # TODO: 向文件输入信息流
-    if debug:
-        print(*kwargs)
+import torch
+from scipy.spatial.distance import jensenshannon
+from configs import HYPER_PARAMETERS as hp
 
 
 def twoD_svd(X, compress_ratio):
@@ -171,6 +150,68 @@ def make_optimizer_class(cls):
             super(DPOptimizerClass, self).step(closure)
 
     return DPOptimizerClass
+
+
+# JS divergence
+def js_divergence(point1, point2):
+    return jensenshannon(point1, point2)
+
+
+# K-means using KL-Divergence
+def kmeans(clients, num_clusters, distance='js_divergence', max_iter=10):
+    if distance == 'js_divergence':
+        pairwise_distance_function = js_divergence
+    else:
+        pairwise_distance_function = None
+
+    # pick centers with numbers of num_clusters
+    centers = [clients[0].likelihood_distribution]
+    n_clients = len(clients)
+    while True:
+        dis_matrix = torch.zeros((len(centers), n_clients))
+        for i, center in enumerate(centers):
+            for j, client in enumerate(clients):
+                dis = pairwise_distance_function(client.likelihood_distribution, center)
+                dis_matrix[i][j] = dis
+        dis_list = dis_matrix.sum(dim=0).tolist()
+        index = dis_list.index(max(dis_list))
+        centers.append(clients[index].likelihood_distribution)
+        if len(centers) == num_clusters:
+            break
+
+    print('start clustering...')
+    clf = {}
+    for iter in range(max_iter):
+        for i in range(num_clusters):
+            clf[i] = []
+        for idx, client in enumerate(clients):
+            distances = []
+            for center in centers:
+                distances.append(pairwise_distance_function(client.likelihood_distribution, center))
+            # print(client.client_id, distances)
+            if iter == max_iter - 1:
+                clf[distances.index(min(distances))].append(idx)
+            else:
+                clf[distances.index(min(distances))].append(client)
+
+        if iter == max_iter - 1:
+            break
+
+        for key, value in clf.items():
+            if len(value) == 0:
+                continue
+            new_center = None
+            for i, client in enumerate(value):
+                if i == 0:
+                    new_center = client.likelihood_distribution
+                else:
+                    new_center += client.likelihood_distribution
+            new_center /= len(value)
+            centers[key] = new_center
+    for key, value in clf.items():
+        print(key, value)
+    print('clustering finished...')
+    return clf
 
 
 DPSGD = make_optimizer_class(SGD)

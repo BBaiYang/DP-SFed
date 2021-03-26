@@ -3,7 +3,6 @@ client in DP_SFed
 """
 import torch
 import torch.optim as optim
-from utils import FED_LOG as fed_log
 from configs import HYPER_PARAMETERS as hp
 from configs import FedAVG_model_path, FedAVG_aggregated_model_path
 import os
@@ -32,18 +31,15 @@ class Client:
             self.model.load_state_dict(torch.load(FedAVG_aggregated_model_path))
 
     def client_train(self):
-        # fed_log(f"{self.client_id} trains the local model...")
+        # print(f"{self.client_id} trains the local model...")
         for _ in range(self.local_epochs):
-            for batch, (X, y) in enumerate(self.train_loader):
-                if batch % self.batches == self.current_round % self.batches:
-                    X = X.to(device)
-                    y = y.to(device)
-                    self.optimizer.zero_grad()
-                    train_l = self.loss(self.model(X), y)
-                    train_l.backward()
-                    self.optimizer.step()
-                else:
-                    continue
+            for X, y in self.train_loader:
+                X = X.to(device)
+                y = y.to(device)
+                self.optimizer.zero_grad()
+                train_l = self.loss(self.model(X), y)
+                train_l.backward()
+                self.optimizer.step()
         self.current_round += 1
 
 
