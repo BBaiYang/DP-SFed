@@ -44,7 +44,7 @@ def make_layers(cfg, size=512, out=10):
             conv2d = nn.Conv2d(in_channels, v, kernel_size=3, padding=1)
             layers += [
                 conv2d,
-                nn.BatchNorm2d(v),
+                # nn.BatchNorm2d(v),
                 nn.ReLU()]
             in_channels = v
     layers += [FlattenLayer()]

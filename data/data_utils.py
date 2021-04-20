@@ -8,6 +8,7 @@ from configs import HYPER_PARAMETERS as hp
 # DATASETS
 # -------------------------------------------------------------------------------------------------------
 DATA_PATH = '~/CODES/Dataset'
+np.random.seed(7)
 
 
 def get_MNIST():
@@ -120,7 +121,7 @@ def split_image_data(data, labels, n_clients=10, classes_per_client=10, shuffle=
         print("Data split:")
         for i, client in enumerate(clients_split):
             split = np.sum(client[1].reshape(1, -1) == np.arange(n_labels).reshape(-1, 1), axis=1)
-            print(" - Client {}: {}".format(i + 1, split))
+            print(" - Client {}: {}".format(i, split))
         print()
 
     if verbose:
@@ -225,7 +226,7 @@ def get_data_loaders(verbose=True):
         client_loaders = [torch.utils.data.DataLoader(
             CustomImageDataset(x, y, transforms_train),
             batch_size=int(x.shape[0] * sampling_pr), shuffle=True) for x, y in split]
-    elif training_strategy == 'FedAVG':
+    elif training_strategy == 'FedAVG' or training_strategy == 'FedPCA':
         client_loaders = [torch.utils.data.DataLoader(
             CustomImageDataset(x, y, transforms_train),
             batch_size=batch_size, shuffle=True) for x, y in split]

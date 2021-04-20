@@ -157,7 +157,7 @@ def js_divergence(point1, point2):
     return jensenshannon(point1, point2)
 
 
-# K-means using KL-Divergence
+# K-means using JS-Divergence
 def kmeans(clients, num_clusters, distance='js_divergence', max_iter=10):
     if distance == 'js_divergence':
         pairwise_distance_function = js_divergence
@@ -165,29 +165,29 @@ def kmeans(clients, num_clusters, distance='js_divergence', max_iter=10):
         pairwise_distance_function = None
 
     # pick centers with numbers of num_clusters
-    centers = [clients[0].likelihood_distribution]
+    centers = [clients[0].ld]
     n_clients = len(clients)
     while True:
         dis_matrix = torch.zeros((len(centers), n_clients))
         for i, center in enumerate(centers):
             for j, client in enumerate(clients):
-                dis = pairwise_distance_function(client.likelihood_distribution, center)
+                dis = pairwise_distance_function(client.ld, center)
                 dis_matrix[i][j] = dis
         dis_list = dis_matrix.sum(dim=0).tolist()
         index = dis_list.index(max(dis_list))
-        centers.append(clients[index].likelihood_distribution)
+        centers.append(clients[index].ld)
         if len(centers) == num_clusters:
             break
 
     print('start clustering...')
     clf = {}
-    for iter in range(max_iter):
+    for iteration in range(max_iter):
         for i in range(num_clusters):
             clf[i] = []
         for idx, client in enumerate(clients):
             distances = []
             for center in centers:
-                distances.append(pairwise_distance_function(client.likelihood_distribution, center))
+                distances.append(pairwise_distance_function(client.ld, center))
             # print(client.client_id, distances)
             if iter == max_iter - 1:
                 clf[distances.index(min(distances))].append(idx)
@@ -203,9 +203,9 @@ def kmeans(clients, num_clusters, distance='js_divergence', max_iter=10):
             new_center = None
             for i, client in enumerate(value):
                 if i == 0:
-                    new_center = client.likelihood_distribution
+                    new_center = client.ld
                 else:
-                    new_center += client.likelihood_distribution
+                    new_center += client.ld
             new_center /= len(value)
             centers[key] = new_center
     for key, value in clf.items():

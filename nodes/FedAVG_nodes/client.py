@@ -1,6 +1,3 @@
-"""
-client in DP_SFed
-"""
 import torch
 import torch.optim as optim
 from configs import HYPER_PARAMETERS as hp
@@ -14,13 +11,13 @@ class Client:
         self.train_loader = dataloader
         self.current_round = 0
         self.batches = len(self.train_loader)
-        self.sample_size = sample_size
+        self.data_size = sample_size
         self.model = None
         self.optimizer = None
         self.loss = torch.nn.CrossEntropyLoss()
         self.local_epochs = hp['local_epochs']
 
-        print(self.client_id, self.sample_size)
+        print(self.client_id, self.data_size)
 
     def load_original_model(self):
         self.model = torch.load(FedAVG_model_path)

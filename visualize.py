@@ -43,9 +43,9 @@ class Animator:
 
 # experiment 1
 x = list(range(10, 2001, 10))
-result1 = torch.load('results/CIFAR10_DP_SFed_sampling_pr_0.03_participating_ratio_0.5_edge_epochs_10_compression_ratio_0.3_sigma_2_NM.pt')['accuracy']
-result4 = torch.load('results/CIFAR10_DP_SFed_sampling_pr_0.03_participating_ratio_0.5_edge_epochs_10_compression_ratio_0.3_sigma_2.pt')['accuracy']
-fedavg_result_1 = torch.load('results/CIFAR10_FedAVG_participating_ratio_0.5.pt')['accuracy']
+result1 = torch.load('ijcai_results/CIFAR10_DP_SFed_sampling_pr_0.03_participating_ratio_0.5_edge_epochs_10_compression_ratio_0.3_sigma_2_NM.pt')['accuracy']
+result4 = torch.load('ijcai_results/CIFAR10_DP_SFed_sampling_pr_0.03_participating_ratio_0.5_edge_epochs_10_compression_ratio_0.3_sigma_2.pt')['accuracy']
+fedavg_result_1 = torch.load('ijcai_results/CIFAR10_FedAVG_participating_ratio_0.5.pt')['accuracy']
 legend1 = 'H-FL without Bias Corrector'
 legend2 = 'H-FL with Bias Corrector'
 fedavg_legend_1 = 'FedAVG'
@@ -54,18 +54,18 @@ legends = [legend1, legend2, fedavg_legend_1]
 # fmts = ['r-', 'b-', 'g-', 'k-', 'y-', 'm-']
 fmts = ['r-', 'b-', 'g--']
 
-# animator = Animator(x, results, x_label='communication_rounds', y_label='TestAcc', legends=legends, fmts=fmts)
-# animator.display('plots/Bias Corrector.png')
+# animator = Animator(x, ijcai_results, x_label='communication_rounds', y_label='TestAcc', legends=legends, fmts=fmts)
+# animator.display('ijcai_plots/Bias Corrector.png')
 
 # experiment 2
-result1 = torch.load('results/CIFAR10_DP_SFed_sampling_pr_0.03_participating_ratio_0.5_edge_epochs_10_compression_ratio_0.3_sigma_2.pt')['accuracy']
-result2 = torch.load('results/CIFAR10_DP_SFed_sampling_pr_0.03_participating_ratio_0.3_edge_epochs_10_compression_ratio_0.3_sigma_2.pt')['accuracy']
-result3 = torch.load('results/CIFAR10_DP_SFed_sampling_pr_0.03_participating_ratio_0.2_edge_epochs_10_compression_ratio_0.3_sigma_2.pt')['accuracy']
-result4 = torch.load('results/CIFAR10_DP_SFed_sampling_pr_0.02_participating_ratio_0.5_edge_epochs_10_compression_ratio_0.3_sigma_2.pt')['accuracy']
-result5 = torch.load('results/CIFAR10_DP_SFed_sampling_pr_0.01_participating_ratio_0.5_edge_epochs_10_compression_ratio_0.3_sigma_2.pt')['accuracy']
-result6 = torch.load('results/CIFAR10_DP_SFed_sampling_pr_0.03_participating_ratio_0.5_edge_epochs_10_compression_ratio_0.2_sigma_2.pt')['accuracy']
-result8 = torch.load('results/CIFAR10_DP_SFed_sampling_pr_0.03_participating_ratio_0.5_edge_epochs_10_compression_ratio_0.3_sigma_10.pt')['accuracy']
-result9 = torch.load('results/CIFAR10_DP_SFed_sampling_pr_0.03_participating_ratio_0.5_edge_epochs_10_compression_ratio_0.3_sigma_20.pt')['accuracy']
+result1 = torch.load('ijcai_results/CIFAR10_DP_SFed_sampling_pr_0.03_participating_ratio_0.5_edge_epochs_10_compression_ratio_0.3_sigma_2.pt')['accuracy']
+result2 = torch.load('ijcai_results/CIFAR10_DP_SFed_sampling_pr_0.03_participating_ratio_0.3_edge_epochs_10_compression_ratio_0.3_sigma_2.pt')['accuracy']
+result3 = torch.load('ijcai_results/CIFAR10_DP_SFed_sampling_pr_0.03_participating_ratio_0.2_edge_epochs_10_compression_ratio_0.3_sigma_2.pt')['accuracy']
+result4 = torch.load('ijcai_results/CIFAR10_DP_SFed_sampling_pr_0.02_participating_ratio_0.5_edge_epochs_10_compression_ratio_0.3_sigma_2.pt')['accuracy']
+result5 = torch.load('ijcai_results/CIFAR10_DP_SFed_sampling_pr_0.01_participating_ratio_0.5_edge_epochs_10_compression_ratio_0.3_sigma_2.pt')['accuracy']
+result6 = torch.load('ijcai_results/CIFAR10_DP_SFed_sampling_pr_0.03_participating_ratio_0.5_edge_epochs_10_compression_ratio_0.2_sigma_2.pt')['accuracy']
+result8 = torch.load('ijcai_results/CIFAR10_DP_SFed_sampling_pr_0.03_participating_ratio_0.5_edge_epochs_10_compression_ratio_0.3_sigma_10.pt')['accuracy']
+result9 = torch.load('ijcai_results/CIFAR10_DP_SFed_sampling_pr_0.03_participating_ratio_0.5_edge_epochs_10_compression_ratio_0.3_sigma_20.pt')['accuracy']
 legend1 = 'P=0.5, S=0.03, C=0.3, sigma=2'
 legend2 = 'P=0.3, S=0.03, C=0.3, sigma=2'
 legend3 = 'P=0.2, S=0.03, C=0.3, sigma=2'
@@ -92,41 +92,41 @@ legends4 = [legend1, legend8, legend9]
 fmts4 = ['b-', 'y-', 'g-']
 
 # animator = Animator(x, results1, x_label='communication_rounds', y_label='TestAcc', legends=legends1, fmts=fmts1)
-# animator.display('plots/Participating Ratio.png')
+# animator.display('ijcai_plots/Participating Ratio.png')
 #
 # animator = Animator(x, results2, x_label='communication_rounds', y_label='TestAcc', legends=legends2, fmts=fmts2)
-# animator.display('plots/Sampling Probability.png')
+# animator.display('ijcai_plots/Sampling Probability.png')
 #
 # animator = Animator(x, results3, x_label='communication_rounds', y_label='TestAcc', legends=legends3, fmts=fmts3)
-# animator.display('plots/Compression Ratio.png')
+# animator.display('ijcai_plots/Compression Ratio.png')
 
 # animator = Animator(x, results4, x_label='communication_rounds', y_label='TestAcc', legends=legends4, fmts=fmts4)
-# animator.display('plots/Noise Level.png')
+# animator.display('ijcai_plots/Noise Level.png')
 
 # experiment 3
 x = list(range(2, 201, 2))
-result1 = torch.load('results/FashionMNIST_DP_SFed_sampling_pr_0.03_participating_ratio_0.5_edge_epochs_10_compression_ratio_0.3_sigma_2.pt')['accuracy']
-result2 = torch.load('results/FashionMNIST_FedAVG_participating_ratio_0.5.pt')['accuracy']
-result3 = torch.load('results/FashionMNIST_STC_participating_ratio_0.5.pt')['accuracy']
-result4 = torch.load('results/FashionMNIST_DGC_participating_ratio_0.5.pt')['accuracy']
+result1 = torch.load('ijcai_results/FashionMNIST_DP_SFed_sampling_pr_0.03_participating_ratio_0.5_edge_epochs_10_compression_ratio_0.3_sigma_2.pt')['accuracy']
+result2 = torch.load('ijcai_results/FashionMNIST_FedAVG_participating_ratio_0.5.pt')['accuracy']
+result3 = torch.load('ijcai_results/FashionMNIST_STC_participating_ratio_0.5.pt')['accuracy']
+result4 = torch.load('ijcai_results/FashionMNIST_DGC_participating_ratio_0.5.pt')['accuracy']
 results = [result1, result2, result3, result4]
 legends = ['H-FL', 'FedAVG', 'STC', 'DGC']
 fmts1 = ['b-', 'r-', 'g-', 'k-']
 
 animator = Animator(x, results, x_label='communication_rounds', y_label='TestAcc', legends=legends, fmts=fmts1)
-animator.display('plots/FMNIST Methods.png')
+animator.display('ijcai_plots/FMNIST Methods.png')
 
 # experiment 4
 x = list(range(10, 2001, 10))
-result1 = torch.load('results/CIFAR10_DP_SFed_sampling_pr_0.03_participating_ratio_0.5_edge_epochs_10_compression_ratio_0.3_sigma_2.pt')['accuracy']
-result2 = torch.load('results/CIFAR10_FedAVG_participating_ratio_0.5.pt')['accuracy']
-result3 = torch.load('results/CIFAR10_STC_participating_ratio_0.5.pt')['accuracy']
-result4 = torch.load('results/CIFAR10_DGC_participating_ratio_0.5.pt')['accuracy']
+result1 = torch.load('ijcai_results/CIFAR10_DP_SFed_sampling_pr_0.03_participating_ratio_0.5_edge_epochs_10_compression_ratio_0.3_sigma_2.pt')['accuracy']
+result2 = torch.load('ijcai_results/CIFAR10_FedAVG_participating_ratio_0.5.pt')['accuracy']
+result3 = torch.load('ijcai_results/CIFAR10_STC_participating_ratio_0.5.pt')['accuracy']
+result4 = torch.load('ijcai_results/CIFAR10_DGC_participating_ratio_0.5.pt')['accuracy']
 results = [result1, result2, result3, result4]
 legends = ['H-FL', 'FedAVG', 'STC', 'DGC']
 fmts1 = ['b-', 'r-', 'g-', 'k-']
-# animator = Animator(x, results, x_label='communication_rounds', y_label='TestAcc', legends=legends, fmts=fmts1)
-# animator.display('plots/CIFAR10 Methods.png')
+# animator = Animator(x, ijcai_results, x_label='communication_rounds', y_label='TestAcc', legends=legends, fmts=fmts1)
+# animator.display('ijcai_plots/CIFAR10 Methods.png')
 
 # eperiment 5
 '''
@@ -149,7 +149,7 @@ def plot_fmnist_overhead():
     plt.bar(range(len(methods_list)), overhead_list, width=.5, color=['b', 'g', 'r', 'y'], tick_label=methods_list)
     plt.xlabel('Different methods')
     plt.ylabel('Communication Overhead (GB)')
-    plt.savefig('plots/FMNST Overhead.png')
+    plt.savefig('ijcai_plots/FMNST Overhead.png')
 
 
 def plot_cifar10_overhead():
@@ -165,7 +165,7 @@ def plot_cifar10_overhead():
     plt.bar(range(len(methods_list)), overhead_list, width=.5, color=['b', 'w', 'r', 'y'], tick_label=methods_list)
     plt.xlabel('Different methods')
     plt.ylabel('Communication Overhead (GB)')
-    plt.savefig('plots/CIFAR10 Overhead.png')
+    plt.savefig('ijcai_plots/CIFAR10 Overhead.png')
 
 
 plot_fmnist_overhead()

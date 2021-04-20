@@ -1,6 +1,3 @@
-"""
-Cloud server
-"""
 import torch
 import torch.nn as nn
 from models.model_factory import model_factory
@@ -62,11 +59,9 @@ class Cloud:
             self.total_size += client.data_size
 
     def aggregate(self):
-        # print("Cloud server begins to aggregate client model...")
         aggregated_client_model = {}
         for k, client in enumerate(self.participating_clients):
             weight = client.data_size / self.total_size
-            # print(f'{client.client_id}\'s weight is {weight}')
             for name, param in client.model.state_dict().items():
                 if k == 0:
                     aggregated_client_model[name] = param.data * weight
@@ -75,7 +70,7 @@ class Cloud:
         self.model.load_state_dict(aggregated_client_model)
         self._save_params()
 
-    def validation(self):
+    def validate(self):
         with torch.no_grad():
             test_acc, test_l = evaluate_accuracy(self.model, self.test_loader)
         return test_acc, test_l

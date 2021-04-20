@@ -1,6 +1,3 @@
-"""
-Cloud server
-"""
 import torch
 import torch.nn as nn
 from models.model_factory import model_factory

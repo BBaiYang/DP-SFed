@@ -1,6 +1,3 @@
-"""
-edge server
-"""
 from _utils.calculation_utils import np_fourD_compound
 import torch.optim as optim
 from configs import initial_edge_model_path, edge_model_path, client_outputs_path, output_grads_path

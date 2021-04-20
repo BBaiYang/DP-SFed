@@ -1,6 +1,3 @@
-"""
-client in DP_SFed
-"""
 import torch
 import torch.optim as optim
 from _utils.calculation_utils import np_fourD_SVD, DPSGD
